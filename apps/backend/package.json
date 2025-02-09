@@ -1,0 +1,16 @@
+{
+  "name": "backend",
+  "main": "src/index.ts",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "elysia": "^1.2.12"
+  },
+  "scripts": {
+    "start": "bun run --watch src/index.ts"
+  }
+}

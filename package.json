@@ -1,0 +1,12 @@
+{
+  "name": "spotify_utils",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "start": "bun run start:backend & bun run start:frontend",
+    "start:backend": "cd apps/backend && bun run start",
+    "start:frontend": "cd apps/frontend && bun run dev"
+  },
+  "packageManager": "bun@1.1.4"
+}
