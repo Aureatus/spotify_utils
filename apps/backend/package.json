@@ -2,13 +2,20 @@
   "name": "backend",
   "main": "src/index.ts",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "^1.2.2",
+    "drizzle-kit": "^0.30.4"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.39.2",
+    "drizzle-typebox": "^0.3.0",
     "elysia": "^1.2.12"
+  },
+  "override": {
+    "@sinclair/typebox": "0.34.15"
   },
   "scripts": {
     "start": "bun run --watch src/index.ts"
