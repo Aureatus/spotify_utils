@@ -21,7 +21,9 @@
     "noFallthroughCasesInSwitch": true,
     // Added this for ShadCN UI Library
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/lib/utils/*": ["./src/lib/utils/*"]
     }
   },
   "include": ["src"],
