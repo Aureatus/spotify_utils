@@ -9,6 +9,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.2.0",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.39.2",
     "drizzle-typebox": "^0.3.0",
