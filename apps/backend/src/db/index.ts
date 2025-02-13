@@ -7,4 +7,4 @@ console.log(process.env.DB_FILE_NAME!);
 
 const sqlite = new Database(process.env.DB_FILE_NAME!);
 
-export const db = drizzle<typeof schema>(sqlite);
+export const db = drizzle(sqlite, { schema: schema });
