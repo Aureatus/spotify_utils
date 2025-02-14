@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@elysiajs/cors": "^1.2.0",
+    "axios": "^1.7.9",
     "better-auth": "^1.1.16",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.39.2",
