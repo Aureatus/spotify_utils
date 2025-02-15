@@ -1,15 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
 import { authClient } from "@/lib/auth-client";
+import { app } from "@/lib/elysia-client";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-
 export default function Index() {
   const { data: session, isPending, error } = authClient.useSession();
+  const { data: playlists } = useQuery({
+    queryKey: ["playlists"],
+    queryFn: async () => {
+      const response = await app.api.spotify.playlists.get();
+      const { data, error } = response;
+      if (error) throw error;
+
+      return data;
+    },
+  });
 
   const spotifySignIn = async () => {
     await authClient.signIn.social({
@@ -19,7 +32,33 @@ export default function Index() {
   };
 
   if (error) return <div>Unexpected error: {error.message}</div>;
-  if (session) return <div>Signed in!</div>;
+  if (session && playlists)
+    return (
+      <div className="container mx-auto p-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+          {playlists?.items?.map((item, index) => (
+            <div key={index} className="flex flex-col items-center">
+              <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-2 border-primary rounded-lg mb-2">
+                <a href={item?.external_urls?.spotify}>
+                  <CardContent className="p-1">
+                    <div className="aspect-square relative">
+                      <img
+                        src={item?.images?.[0]?.url}
+                        alt={`Playlist ${item.name}`}
+                        className="object-cover w-full h-full rounded"
+                      />
+                    </div>
+                  </CardContent>
+                </a>
+              </Card>
+              <p className="text-center text-sm break-words w-full">
+                {item.name}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
 
   if (!isPending && !session) {
     return (
