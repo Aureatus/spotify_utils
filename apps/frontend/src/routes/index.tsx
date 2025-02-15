@@ -3,10 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodValidator } from "@tanstack/zod-adapter";
 
-import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import MergeDialog from "@/components/features/playlist-merge/merge-dialog";
+import PlaylistCard from "@/components/features/playlist-merge/card";
 import PlaylistMergerHeader from "@/components/features/playlist-merge/merge-header";
 
 import { authClient } from "@/lib/auth-client";
@@ -104,39 +104,11 @@ export default function Index() {
         <div className="container mx-auto p-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {playlists?.items?.map((playlist) => (
-              <Card
-                key={playlist.id}
-                className="overflow-hidden cursor-pointer relative group hover:bg-muted/50 transition-colors"
-                onClick={() => playlist.id && handlePlaylistSelect(playlist.id)}
-              >
-                <CardContent className="p-2">
-                  <div className="aspect-square relative mb-2">
-                    <img
-                      src={playlist?.images?.[0]?.url || "/placeholder.svg"}
-                      alt={playlist.name}
-                      className="object-cover w-full h-full rounded"
-                    />
-                    {/* Selection overlay */}
-                    {playlist.id && selectedPlaylists.includes(playlist.id) && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="absolute inset-0 bg-black/40" />
-                        <div className="relative z-10 bg-primary rounded-full p-2">
-                          <Check className="text-white w-6 h-6" />
-                        </div>
-                      </div>
-                    )}
-                    {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <p className="text-sm font-medium truncate">
-                    {playlist.name}
-                  </p>
-                  {/* Selection indicator */}
-                  {playlist.id && selectedPlaylists.includes(playlist.id) && (
-                    <div className="absolute top-0 right-0 left-0 h-1 bg-primary" />
-                  )}
-                </CardContent>
-              </Card>
+              <PlaylistCard
+                playlist={playlist}
+                selectedPlaylists={selectedPlaylists}
+                onPlaylistSelection={handlePlaylistSelect}
+              />
             ))}
           </div>
         </div>
