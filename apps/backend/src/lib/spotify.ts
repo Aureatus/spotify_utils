@@ -2,6 +2,9 @@ import { eq } from "drizzle-orm";
 
 import { db } from "../db/index";
 import * as schema from "../db/schema";
+import { getSpotifyWebAPIWithFixesAndImprovementsFromSonallux } from "./orval/spotify-api-client";
+
+const spotifyClient = getSpotifyWebAPIWithFixesAndImprovementsFromSonallux();
 
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
@@ -91,4 +94,17 @@ const getValidAccessToken = async (userId: string): Promise<string> => {
   return accessToken;
 };
 
-export { refreshSpotifyToken, getValidAccessToken };
+const getCurrentUserPlaylists = async (accessToken: string) => {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${accessToken}`,
+    "Content-Type": "application/json",
+  };
+  const data = await spotifyClient.getAListOfCurrentUsersPlaylists(
+    {},
+    { headers }
+  );
+
+  return data.data;
+};
+
+export { refreshSpotifyToken, getCurrentUserPlaylists, getValidAccessToken };
