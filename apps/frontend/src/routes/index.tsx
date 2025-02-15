@@ -6,12 +6,15 @@ import { zodValidator } from "@tanstack/zod-adapter";
 import { Check, Music2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import MergeDialog from "@/components/features/playlist-merge/merge-dialog";
 
 import { authClient } from "@/lib/auth-client";
 import { app } from "@/lib/elysia-client";
 
 const selectedPlaylistsSchema = z.object({
   selectedPlaylists: z.array(z.string()).default([]),
+  mergedPlaylistName: z.string().optional(),
+  dialogOpen: z.boolean().default(false),
 });
 
 export const Route = createFileRoute("/")({
@@ -27,12 +30,13 @@ export default function Index() {
       const response = await app.api.spotify.playlists.get();
       const { data, error } = response;
       if (error) throw error;
-
       return data;
     },
   });
 
-  const { selectedPlaylists } = Route.useSearch();
+  const { selectedPlaylists, mergedPlaylistName, dialogOpen } =
+    Route.useSearch();
+
   const navigate = useNavigate({ from: Route.fullPath });
 
   const spotifySignIn = async () => {
@@ -53,7 +57,38 @@ export default function Index() {
     });
   };
 
-  const handleMergePlaylists = () => {};
+  const handleMergePlaylists = () => {
+    navigate({
+      search: (prev) => ({ ...prev, dialogOpen: true }),
+      resetScroll: false,
+    });
+  };
+
+  const handleDialogClose = () => {
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        dialogOpen: false,
+        mergedPlaylistName: undefined,
+      }),
+      resetScroll: false,
+    });
+  };
+
+  const handlePlaylistNameChange = (name: string) => {
+    navigate({
+      search: (prev) => ({ ...prev, mergedPlaylistName: name }),
+      resetScroll: false,
+    });
+  };
+
+  const handleMergeConfirm = () => {
+    if (!mergedPlaylistName) return;
+
+    console.log("Merging playlists with name:", mergedPlaylistName);
+
+    handleDialogClose();
+  };
 
   if (error) return <div>Unexpected error: {error.message}</div>;
 
@@ -159,6 +194,18 @@ export default function Index() {
             ))}
           </div>
         </div>
+
+        <MergeDialog
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            if (!open) handleDialogClose();
+          }}
+          onClose={handleDialogClose}
+          playlistCount={selectedPlaylists.length}
+          playlistName={mergedPlaylistName}
+          onPlaylistNameChange={handlePlaylistNameChange}
+          onConfirm={handleMergeConfirm}
+        />
       </div>
     );
 
