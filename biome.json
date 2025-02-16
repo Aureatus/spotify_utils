@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": ["**/orval/spotify-api-client.ts"]
+		"ignore": ["**/orval/spotify-api-client.ts", "**/routeTree.gen.ts"]
 	},
 	"formatter": {
 		"enabled": true,
