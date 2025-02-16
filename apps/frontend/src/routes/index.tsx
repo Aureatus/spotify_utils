@@ -84,9 +84,34 @@ export default function Index() {
   };
 
   const handleMergeConfirm = () => {
-    if (!mergedPlaylistName) return;
+    if (!mergedPlaylistName || !playlists) return;
 
-    console.log("Merging playlists with name:", mergedPlaylistName);
+    const body = {
+      playlistName: mergedPlaylistName,
+      playlistsToMerge: selectedPlaylists
+        .map((playlistId) => {
+          const targetPlaylist = playlists?.items?.find(
+            (playlist) => playlist.id === playlistId
+          );
+          if (
+            !targetPlaylist ||
+            !targetPlaylist.name ||
+            !targetPlaylist.id ||
+            !targetPlaylist.tracks ||
+            !targetPlaylist.tracks.href ||
+            !targetPlaylist.tracks.total
+          )
+            return null;
+
+          return {
+            name: targetPlaylist?.name,
+            id: targetPlaylist?.id,
+            trackListCount: targetPlaylist.tracks.total,
+          };
+        })
+        .filter((e) => e !== null),
+    };
+    app.api.spotify.merge.post(body);
 
     handleDialogClose();
   };
