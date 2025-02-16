@@ -27,11 +27,11 @@ const app = new Elysia()
 	.group("/api", (app) =>
 		app.all("/auth/*", betterAuthView).group("/spotify", (app) =>
 			app
-				.get("/spotify/playlists", async ({ access_token }) => {
+				.get("/playlists", async ({ access_token }) => {
 					return access_token && (await getCurrentUserPlaylists(access_token));
 				})
 				.post(
-					"/spotify/merge",
+					"/merge",
 					async ({ access_token, body }) => {
 						return (
 							access_token &&
