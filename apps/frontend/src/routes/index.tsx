@@ -3,8 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodValidator } from "@tanstack/zod-adapter";
 
+import { useToast } from "@/hooks/use-toast";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+
 import MergeDialog from "@/components/features/playlist-merge/merge-dialog";
 import PlaylistCard from "@/components/features/playlist-merge/card";
 import PlaylistMergerHeader from "@/components/features/playlist-merge/merge-header";
@@ -39,6 +42,8 @@ export default function Index() {
     Route.useSearch();
 
   const navigate = useNavigate({ from: Route.fullPath });
+
+  const { toast } = useToast();
 
   const spotifySignIn = async () => {
     await authClient.signIn.social({
@@ -83,7 +88,7 @@ export default function Index() {
     });
   };
 
-  const handleMergeConfirm = () => {
+  const handleMergeConfirm = async () => {
     if (!mergedPlaylistName || !playlists) return;
 
     const body = {
@@ -111,9 +116,29 @@ export default function Index() {
         })
         .filter((e) => e !== null),
     };
-    app.api.spotify.merge.post(body);
+    const loadingToast = toast({
+      title: "Merging playlists...",
+      duration: Infinity,
+      style: { borderRadius: 6 },
+    });
 
-    handleDialogClose();
+    try {
+      await app.api.spotify.merge.post(body);
+      handleDialogClose();
+      toast({
+        title: `Successfully created "${mergedPlaylistName}"`,
+        duration: 500,
+        style: { borderRadius: 6 },
+      });
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "Failed to merge playlists",
+        style: { borderRadius: 6 },
+      });
+    } finally {
+      loadingToast.dismiss();
+    }
   };
 
   if (error) return <div>Unexpected error: {error.message}</div>;
