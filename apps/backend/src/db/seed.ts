@@ -16,4 +16,4 @@ await db.insert(schema.movies).values([
 	},
 ]);
 
-console.log(`Seeding complete.`);
+console.log("Seeding complete.");

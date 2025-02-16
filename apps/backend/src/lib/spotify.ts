@@ -16,7 +16,7 @@ const refreshSpotifyToken = async (refreshToken: string) => {
 		);
 
 	const basicCode = Buffer.from(
-		SPOTIFY_CLIENT_ID + ":" + SPOTIFY_CLIENT_SECRET,
+		`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`,
 	).toString("base64");
 
 	const response = await fetch("https://accounts.spotify.com/api/token", {

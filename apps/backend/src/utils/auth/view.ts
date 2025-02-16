@@ -6,9 +6,9 @@ const betterAuthView = (context: Context) => {
 	if (BETTER_AUTH_ACCEPT_METHODS.includes(context.request.method)) {
 		console.log(context.request);
 		return auth.handler(context.request);
-	} else {
-		context.error(405);
 	}
+
+	context.error(405);
 };
 
 export default betterAuthView;
