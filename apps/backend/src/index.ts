@@ -1,3 +1,4 @@
+import { logger } from "@bogeychan/elysia-logger";
 import cors from "@elysiajs/cors";
 import { Elysia, t } from "elysia";
 
@@ -22,6 +23,21 @@ const SpotifyMergeSchema = {
 };
 
 const app = new Elysia()
+	.use(
+		logger({
+			transport: {
+				target: "pino-pretty",
+				options: {
+					colorize: true,
+					levelFirst: true,
+					messageFormat: true,
+					ignore: "pid,hostname",
+				},
+			},
+			autoLogging: true,
+			level: "trace",
+		}),
+	)
 	.use(cors())
 	.derive(({ request }) => userMiddleware(request))
 	.group("/api", (app) =>
@@ -49,9 +65,5 @@ const app = new Elysia()
 
 	.get("/health", () => "OK")
 	.listen(3000);
-
-console.log(
-	`🦊 Backend running at ${app.server?.hostname}:${app.server?.port}`,
-);
 
 export type App = typeof app;
