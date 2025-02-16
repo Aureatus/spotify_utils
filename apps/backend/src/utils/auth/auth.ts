@@ -10,6 +10,14 @@ export const auth = betterAuth({
     spotify: {
       clientId: process.env.SPOTIFY_CLIENT_ID!,
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET!,
+      scope: [
+        "playlist-read-private",
+        "playlist-read-collaborative",
+        "user-read-private",
+        "user-read-email",
+        "playlist-modify-public",
+        "playlist-modify-private",
+      ],
     },
   },
   database: drizzleAdapter(db, {

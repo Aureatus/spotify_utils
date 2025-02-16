@@ -2,6 +2,9 @@ import { eq } from "drizzle-orm";
 
 import { db } from "../db/index";
 import * as schema from "../db/schema";
+import { getSpotifyWebAPIWithFixesAndImprovementsFromSonallux } from "./orval/spotify-api-client";
+
+const spotifyClient = getSpotifyWebAPIWithFixesAndImprovementsFromSonallux();
 
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
@@ -91,4 +94,126 @@ const getValidAccessToken = async (userId: string): Promise<string> => {
   return accessToken;
 };
 
-export { refreshSpotifyToken, getValidAccessToken };
+const calculatePageOffsets = (totalItems: number, pageSize: number) => {
+  const pageCount = Math.ceil(totalItems / pageSize);
+  return Array.from({ length: pageCount }, (_, i) => i * pageSize);
+};
+
+const createBatches = <T>(items: T[], batchSize: number) => {
+  const batches = [];
+  for (let i = 0; i < items.length; i += batchSize) {
+    batches.push({
+      items: items.slice(i, i + batchSize),
+      position: i,
+    });
+  }
+  return batches;
+};
+
+const getCurrentUserPlaylists = async (accessToken: string) => {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${accessToken}`,
+    "Content-Type": "application/json",
+  };
+  const data = await spotifyClient.getAListOfCurrentUsersPlaylists(
+    {},
+    { headers }
+  );
+
+  return data.data;
+};
+
+const getAllPlaylistTracks = async (
+  playlistId: string,
+  trackListCount: number,
+  headers: Record<string, string>
+) => {
+  const limit = 50;
+  const offsets = calculatePageOffsets(trackListCount, limit);
+
+  const trackBatches = await Promise.all(
+    offsets.map((offset) =>
+      spotifyClient.getPlaylistsTracks(
+        playlistId,
+        {
+          limit,
+          offset,
+          fields: "items(track(uri))",
+        },
+        { headers: headers }
+      )
+    )
+  );
+
+  return trackBatches.flatMap((batch) => batch.data.items);
+};
+
+type playlist = {
+  name: string;
+  id: string;
+  trackListCount: number;
+};
+
+const createMergedPlaylistForUser = async (
+  accessToken: string,
+  playlistName: string,
+  playlistsToMerge: playlist[]
+) => {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${accessToken}`,
+    "Content-Type": "application/json",
+  };
+
+  const user = await spotifyClient.getCurrentUsersProfile({ headers });
+  if (!user.data.id)
+    throw new Error(
+      `No user id found for access token with status ${user.status}: ${user.statusText}`
+    );
+
+  const trackURIs = (
+    await Promise.all(
+      playlistsToMerge.map(({ id, trackListCount }) =>
+        getAllPlaylistTracks(id, trackListCount, headers)
+      )
+    )
+  )
+    .flat()
+    .map((e) => e?.track?.uri)
+    .filter((track) => track !== undefined);
+
+  const trackBatches = createBatches(trackURIs, 100);
+
+  const description = `Playlist created by spotify_utils - merged result of playlists: ${playlistsToMerge.map((e) => e.name).join(", ")}`;
+
+  const newPlaylist = await spotifyClient.createPlaylist(
+    user.data.id,
+    {
+      name: playlistName,
+      description: description,
+    },
+    { headers: headers }
+  );
+
+  const newPlaylistId = newPlaylist.data.id;
+
+  if (!newPlaylistId)
+    throw new Error(
+      `Failed to create playlist with name: ${playlistName}, description :${description}`
+    );
+
+  for (const { items, position } of trackBatches) {
+    await spotifyClient.addTracksToPlaylist(
+      newPlaylistId,
+      { uris: items, position },
+      {},
+      { headers }
+    );
+  }
+};
+
+export {
+  refreshSpotifyToken,
+  getCurrentUserPlaylists,
+  createMergedPlaylistForUser,
+  getValidAccessToken,
+};
