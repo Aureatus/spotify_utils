@@ -1,29 +1,29 @@
 {
-  "name": "backend",
-  "main": "src/index.ts",
-  "devDependencies": {
-    "@types/bun": "^1.2.2",
-    "bun-types": "^1.2.2",
-    "drizzle-kit": "^0.30.4",
-    "orval": "^7.5.0"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "@elysiajs/cors": "^1.2.0",
-    "axios": "^1.7.9",
-    "better-auth": "^1.1.16",
-    "dotenv": "^16.4.7",
-    "drizzle-orm": "^0.39.2",
-    "drizzle-typebox": "^0.3.0",
-    "elysia": "^1.2.12"
-  },
-  "override": {
-    "@sinclair/typebox": "0.34.15"
-  },
-  "scripts": {
-    "start": "bun run --watch src/index.ts",
-    "generate-spotify-client": "orval --config ./src/lib/orval/orval.config.js"
-  }
+	"name": "backend",
+	"main": "src/index.ts",
+	"devDependencies": {
+		"@types/bun": "^1.2.2",
+		"bun-types": "^1.2.2",
+		"drizzle-kit": "^0.30.4",
+		"orval": "^7.5.0"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	},
+	"dependencies": {
+		"@elysiajs/cors": "^1.2.0",
+		"axios": "^1.7.9",
+		"better-auth": "^1.1.16",
+		"dotenv": "^16.4.7",
+		"drizzle-orm": "^0.39.2",
+		"drizzle-typebox": "^0.3.0",
+		"elysia": "^1.2.12"
+	},
+	"override": {
+		"@sinclair/typebox": "0.34.15"
+	},
+	"scripts": {
+		"start": "bun run --watch src/index.ts",
+		"generate-spotify-client": "orval --config ./src/lib/orval/orval.config.js"
+	}
 }
