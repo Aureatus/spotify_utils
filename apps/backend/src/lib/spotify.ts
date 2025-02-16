@@ -89,8 +89,6 @@ const getValidAccessToken = async (userId: string): Promise<string> => {
 		})
 		.where(eq(schema.account.userId, userId));
 
-	console.log("Spotify token refreshed and updated.");
-
 	return accessToken;
 };
 
