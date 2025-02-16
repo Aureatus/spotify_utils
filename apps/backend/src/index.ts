@@ -9,6 +9,16 @@ import {
 import { userMiddleware } from "./middlewares/auth-middleware";
 import betterAuthView from "./utils/auth/view";
 
+// declare module "bun" {
+// 	interface Env {
+// 		DB_FILE_NAME: string;
+// 		BETTER_AUTH_SECRET: string;
+// 		BETTER_AUTH_URL: string;
+// 		SPOTIFY_CLIENT_ID: string;
+// 		SPOTIFY_CLIENT_SECRET: string;
+// 	}
+// }
+
 const SpotifyMergeSchema = {
 	body: t.Object({
 		playlistName: t.String(),

@@ -1,8 +1,7 @@
 import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
 
-const { DB_FILE_NAME } = process.env;
-if (!DB_FILE_NAME) throw new Error("DB file name not provided");
+import { DB_FILE_NAME } from "./src/env";
 
 export default defineConfig({
 	out: "./drizzle",

@@ -2,19 +2,12 @@ import { eq } from "drizzle-orm";
 
 import { db } from "../db/index";
 import * as schema from "../db/schema";
+import { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } from "../env";
 import { getSpotifyWebAPIWithFixesAndImprovementsFromSonallux } from "./orval/spotify-api-client";
 
 const spotifyClient = getSpotifyWebAPIWithFixesAndImprovementsFromSonallux();
 
-const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
-const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-
 const refreshSpotifyToken = async (refreshToken: string) => {
-	if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET)
-		throw new Error(
-			"Missing Spotify client credentials in environment variables.",
-		);
-
 	const basicCode = Buffer.from(
 		`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`,
 	).toString("base64");

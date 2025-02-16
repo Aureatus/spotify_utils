@@ -3,8 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
 import { db } from "../../db/index";
 import { account, session, user, verification } from "../../db/schema";
-
-const { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } = process.env;
+import { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } from "../../env";
 
 if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET)
 	throw new Error("Spotify credentials missing");
