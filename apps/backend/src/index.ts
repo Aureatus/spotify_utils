@@ -8,6 +8,19 @@ import {
   getCurrentUserPlaylists,
 } from "./lib/spotify";
 
+const SpotifyMergeSchema = {
+  body: t.Object({
+    playlistName: t.String(),
+    playlistsToMerge: t.Array(
+      t.Object({
+        name: t.String(),
+        id: t.String(),
+        trackListCount: t.Number(),
+      })
+    ),
+  }),
+};
+
 const app = new Elysia()
   .use(cors())
   .derive(({ request }) => userMiddleware(request))
@@ -29,18 +42,7 @@ const app = new Elysia()
               ))
             );
           },
-          {
-            body: t.Object({
-              playlistName: t.String(),
-              playlistsToMerge: t.Array(
-                t.Object({
-                  name: t.String(),
-                  id: t.String(),
-                  trackListCount: t.Number(),
-                })
-              ),
-            }),
-          }
+          SpotifyMergeSchema
         )
     )
   )
