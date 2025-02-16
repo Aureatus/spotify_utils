@@ -24,6 +24,6 @@ layout {
     }
 
     tab name="Base" {
-        pane cwd="apps"  // Use cwd instead of command="cd"
+        pane cwd="apps"
     }
 }
