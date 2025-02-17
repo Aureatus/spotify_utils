@@ -1,50 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { zodValidator } from "@tanstack/zod-adapter";
-import { z } from "zod";
-
-import { useToast } from "@/hooks/use-toast";
+import { Link, createFileRoute } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-import PlaylistCard from "@/components/features/playlist-merge/card";
-import MergeDialog from "@/components/features/playlist-merge/merge-dialog";
-import PlaylistMergerHeader from "@/components/features/playlist-merge/merge-header";
-
 import { authClient } from "@/lib/auth-client";
-import { app } from "@/lib/elysia-client";
-import type { SimplifiedPlaylistObject } from "../../../backend/src/lib/orval/spotify-api-client";
-
-const selectedPlaylistsSchema = z.object({
-	selectedPlaylists: z.array(z.string()).default([]),
-	mergedPlaylistName: z.string().optional(),
-	dialogOpen: z.boolean().default(false),
-});
 
 export const Route = createFileRoute("/")({
 	component: Index,
-	validateSearch: zodValidator(selectedPlaylistsSchema),
 });
 
 export default function Index() {
 	const { data: session, isPending, error } = authClient.useSession();
-	const { data: playlists } = useQuery({
-		queryKey: ["playlists"],
-		queryFn: async () => {
-			const response = await app.api.spotify.playlists.get();
-			const { data, error } = response;
-			if (error) throw error;
-			return data;
-		},
-	});
-
-	const { selectedPlaylists, mergedPlaylistName, dialogOpen } =
-		Route.useSearch();
-
-	const navigate = useNavigate({ from: Route.fullPath });
-
-	const { toast } = useToast();
 
 	const spotifySignIn = async () => {
 		await authClient.signIn.social({
@@ -52,138 +18,35 @@ export default function Index() {
 			callbackURL: `${window.location.origin}`,
 		});
 	};
-
-	const handlePlaylistSelect = (playlistId: string) => {
-		const newSelectedPlaylists = selectedPlaylists.includes(playlistId)
-			? selectedPlaylists.filter((id) => id !== playlistId)
-			: [...selectedPlaylists, playlistId];
-
-		navigate({
-			search: (prev) => ({ ...prev, selectedPlaylists: newSelectedPlaylists }),
-			resetScroll: false,
-		});
-	};
-
-	const handleMergePlaylists = () => {
-		navigate({
-			search: (prev) => ({ ...prev, dialogOpen: true }),
-			resetScroll: false,
-		});
-	};
-
-	const handleDialogClose = () => {
-		navigate({
-			search: (prev) => ({
-				...prev,
-				dialogOpen: false,
-				mergedPlaylistName: undefined,
-			}),
-			resetScroll: false,
-		});
-	};
-
-	const handlePlaylistNameChange = (name: string) => {
-		navigate({
-			search: (prev) => ({ ...prev, mergedPlaylistName: name }),
-			resetScroll: false,
-		});
-	};
-
-	const handleMergeConfirm = async () => {
-		if (!mergedPlaylistName || !playlists) return;
-
-		const body = {
-			playlistName: mergedPlaylistName,
-			playlistsToMerge: selectedPlaylists
-				.map((playlistId) => {
-					const targetPlaylist = playlists?.items?.find(
-						(playlist) => playlist.id === playlistId,
-					);
-					if (
-						!targetPlaylist ||
-						!targetPlaylist.name ||
-						!targetPlaylist.id ||
-						!targetPlaylist.tracks ||
-						!targetPlaylist.tracks.href ||
-						!targetPlaylist.tracks.total
-					)
-						return null;
-
-					return {
-						name: targetPlaylist?.name,
-						id: targetPlaylist?.id,
-						trackListCount: targetPlaylist.tracks.total,
-					};
-				})
-				.filter((e) => e !== null),
-		};
-		const loadingToast = toast({
-			title: "Merging playlists...",
-			duration: Number.POSITIVE_INFINITY,
-			style: { borderRadius: 6 },
-		});
-
-		try {
-			await app.api.spotify.merge.post(body);
-			handleDialogClose();
-			toast({
-				title: `Successfully created "${mergedPlaylistName}"`,
-				duration: 500,
-				style: { borderRadius: 6 },
-			});
-		} catch {
-			toast({
-				variant: "destructive",
-				title: "Failed to merge playlists",
-				style: { borderRadius: 6 },
-			});
-		} finally {
-			loadingToast.dismiss();
-		}
-	};
-
 	if (error) return <div>Unexpected error: {error.message}</div>;
 
-	if (session && playlists)
+	if (!isPending && session) {
 		return (
-			<div className="w-full min-h-screen bg-background">
-				<PlaylistMergerHeader
-					selectedPlaylists={selectedPlaylists}
-					onMergePlaylists={handleMergePlaylists}
-				/>
-
-				<div className="container mx-auto p-4">
-					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-						{playlists?.items?.map((playlist: SimplifiedPlaylistObject) => (
-							<PlaylistCard
-								playlist={playlist}
-								selectedPlaylists={selectedPlaylists}
-								onPlaylistSelection={handlePlaylistSelect}
-								key={playlist.id}
-							/>
-						))}
-					</div>
-				</div>
-
-				<MergeDialog
-					open={dialogOpen}
-					onOpenChange={(open) => {
-						if (!open) handleDialogClose();
-					}}
-					onClose={handleDialogClose}
-					playlistCount={selectedPlaylists.length}
-					playlistName={mergedPlaylistName}
-					onPlaylistNameChange={handlePlaylistNameChange}
-					onConfirm={handleMergeConfirm}
-				/>
+			<div className="flex items-center justify-center h-screen bg-background">
+				<Card className="max-w-lg w-full p-8">
+					<CardContent className="p-0 w-full flex flex-col items-center gap-4">
+						<h1 className="text-2xl font-bold">Welcome to Playlist Merger</h1>
+						<p className="text-muted-foreground">
+							Ready to merge your playlists?
+						</p>
+						<Link to="/merge">
+							<Button className="w-full px-8 py-3">
+								Go to Playlist Merger
+							</Button>
+						</Link>
+					</CardContent>
+				</Card>
 			</div>
 		);
+	}
 
 	if (!isPending && !session) {
 		return (
-			<div className="flex items-center justify-center h-screen">
+			<div className="flex items-center justify-center h-screen bg-background">
 				<Card className="max-w-lg w-full p-8">
-					<CardContent className="p-0 w-full flex items-center">
+					<CardContent className="p-0 w-full flex flex-col items-center gap-4">
+						<h1 className="text-2xl font-bold">Welcome to Spotify Utilities</h1>
+						<p className="text-muted-foreground">Sign in to get started</p>
 						<Button
 							variant="outline"
 							className="w-full px-8 py-3 gap-2"
