@@ -7,10 +7,14 @@ import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/")({
 	component: Index,
+	loader: async () => {
+		const { data } = await authClient.getSession();
+		return { session: data } as const;
+	},
 });
 
 export default function Index() {
-	const { data: session, isPending, error } = authClient.useSession();
+	const { session } = Route.useLoaderData();
 
 	const spotifySignIn = async () => {
 		await authClient.signIn.social({
@@ -18,29 +22,8 @@ export default function Index() {
 			callbackURL: `${window.location.origin}`,
 		});
 	};
-	if (error) return <div>Unexpected error: {error.message}</div>;
 
-	if (!isPending && session) {
-		return (
-			<div className="flex items-center justify-center h-screen bg-background">
-				<Card className="max-w-lg w-full p-8">
-					<CardContent className="p-0 w-full flex flex-col items-center gap-4">
-						<h1 className="text-2xl font-bold">Welcome to Playlist Merger</h1>
-						<p className="text-muted-foreground">
-							Ready to merge your playlists?
-						</p>
-						<Link to="/merge">
-							<Button className="w-full px-8 py-3">
-								Go to Playlist Merger
-							</Button>
-						</Link>
-					</CardContent>
-				</Card>
-			</div>
-		);
-	}
-
-	if (!isPending && !session) {
+	if (!session) {
 		return (
 			<div className="flex items-center justify-center h-screen bg-background">
 				<Card className="max-w-lg w-full p-8">
@@ -72,4 +55,20 @@ export default function Index() {
 			</div>
 		);
 	}
+
+	return (
+		<div className="flex items-center justify-center h-screen bg-background">
+			<Card className="max-w-lg w-full p-8">
+				<CardContent className="p-0 w-full flex flex-col items-center gap-4">
+					<h1 className="text-2xl font-bold">Welcome to Playlist Merger</h1>
+					<p className="text-muted-foreground">
+						Ready to merge your playlists?
+					</p>
+					<Link to="/merge">
+						<Button className="w-full px-8 py-3">Go to Playlist Merger</Button>
+					</Link>
+				</CardContent>
+			</Card>
+		</div>
+	);
 }
