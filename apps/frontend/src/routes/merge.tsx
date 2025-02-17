@@ -22,10 +22,8 @@ const selectedPlaylistsSchema = z.object({
 export const Route = createFileRoute("/merge")({
 	validateSearch: zodValidator(selectedPlaylistsSchema),
 	beforeLoad: async () => {
-		const session = await authClient.getSession();
-		if (!session) {
-			throw redirect({ to: "/" });
-		}
+		const { data, error } = await authClient.getSession();
+		if (error || !data) throw redirect({ to: "/" });
 	},
 	component: MergePage,
 });
