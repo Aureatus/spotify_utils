@@ -49,11 +49,11 @@ const app = new Elysia()
 		}),
 	)
 	.use(cors())
-	.derive(({ request }) => userMiddleware(request))
 	.group("/api", (app) =>
 		app
 			// set parse to avoid body read error, see https://github.com/bogeychan/elysia-logger/issues/26#issuecomment-2581666177
-			.all("/auth/*", betterAuthView, { parse: () => 1 }) //
+			.all("/auth/*", betterAuthView, { parse: () => 1 })
+			.derive((context) => userMiddleware(context))
 			.group("/spotify", (app) =>
 				app
 					.get("/playlists", async ({ access_token }) => {

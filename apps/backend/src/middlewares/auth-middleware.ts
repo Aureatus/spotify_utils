@@ -1,15 +1,17 @@
 import type { Session, User } from "better-auth/types";
+import type { Context } from "elysia";
 
 import { getValidAccessToken } from "../lib/spotify";
 import { auth } from "../utils/auth/auth";
 
-export const userMiddleware = async (request: Request) => {
-	const session = await auth.api.getSession({ headers: request.headers });
+export const userMiddleware = async (c: Context) => {
+	const session = await auth.api.getSession({ headers: c.request.headers });
 
 	if (!session) {
+		c.set.status = 401;
 		return {
-			user: null,
-			session: null,
+			success: "error",
+			message: "Unauthorized Access: Token is missing",
 		};
 	}
 
