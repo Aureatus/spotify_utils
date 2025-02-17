@@ -51,26 +51,31 @@ const app = new Elysia()
 	.use(cors())
 	.derive(({ request }) => userMiddleware(request))
 	.group("/api", (app) =>
-		app.all("/auth/*", betterAuthView).group("/spotify", (app) =>
-			app
-				.get("/playlists", async ({ access_token }) => {
-					return access_token && (await getCurrentUserPlaylists(access_token));
-				})
-				.post(
-					"/merge",
-					async ({ access_token, body }) => {
+		app
+			// set parse to avoid body read error, see https://github.com/bogeychan/elysia-logger/issues/26#issuecomment-2581666177
+			.all("/auth/*", betterAuthView, { parse: () => 1 }) //
+			.group("/spotify", (app) =>
+				app
+					.get("/playlists", async ({ access_token }) => {
 						return (
-							access_token &&
-							(await createMergedPlaylistForUser(
-								access_token,
-								body.playlistName,
-								body.playlistsToMerge,
-							))
+							access_token && (await getCurrentUserPlaylists(access_token))
 						);
-					},
-					SpotifyMergeSchema,
-				),
-		),
+					})
+					.post(
+						"/merge",
+						async ({ access_token, body }) => {
+							return (
+								access_token &&
+								(await createMergedPlaylistForUser(
+									access_token,
+									body.playlistName,
+									body.playlistsToMerge,
+								))
+							);
+						},
+						SpotifyMergeSchema,
+					),
+			),
 	)
 
 	.get("/health", () => "OK")
