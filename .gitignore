@@ -11,3 +11,5 @@ node_modules
 
 # Database
 *.sqlite
+*.sqlite-shm
+*.sqlite-wal
