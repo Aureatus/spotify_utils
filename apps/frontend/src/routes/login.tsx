@@ -17,6 +17,7 @@ export const Route = createFileRoute("/login")({
 		if (data) {
 			throw redirect({
 				to: search.redirect ?? "/",
+				replace: true,
 			});
 		}
 	},

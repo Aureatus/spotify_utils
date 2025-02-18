@@ -30,6 +30,7 @@ export const Route = createFileRoute("/merge")({
 		if (error || !data)
 			throw redirect({
 				to: "/login",
+				replace: true,
 				search: {
 					redirect: location.pathname,
 				},
