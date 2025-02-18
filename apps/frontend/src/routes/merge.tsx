@@ -18,7 +18,7 @@ import { app } from "@/lib/elysia-client";
 import type { SimplifiedPlaylistObject } from "../../../backend/src/lib/orval/spotify-api-client";
 
 const selectedPlaylistsSchema = z.object({
-	selectedPlaylists: z.array(z.string()).default([]),
+	selectedPlaylists: z.array(z.string()).default([]), // Keep array order to track selection sequence
 	mergedPlaylistName: z.string().optional(),
 	dialogOpen: z.boolean().default(false),
 });
@@ -48,15 +48,26 @@ export default function MergePage() {
 	const { toast } = useToast();
 
 	const handlePlaylistSelect = (playlistId: string) => {
-		const newSelectedPlaylists = selectedPlaylists.includes(playlistId)
-			? selectedPlaylists.filter((id) => id !== playlistId)
-			: [...selectedPlaylists, playlistId];
+		let newSelectedPlaylists: string[];
+
+		if (selectedPlaylists.includes(playlistId)) {
+			newSelectedPlaylists = selectedPlaylists.filter(
+				(id) => id !== playlistId,
+			);
+		} else {
+			newSelectedPlaylists = [...selectedPlaylists, playlistId];
+		}
 
 		navigate({
 			search: (prev) => ({ ...prev, selectedPlaylists: newSelectedPlaylists }),
 			resetScroll: false,
 			replace: true,
 		});
+	};
+
+	const getSelectionOrder = (playlistId: string): number | null => {
+		const index = selectedPlaylists.indexOf(playlistId);
+		return index === -1 ? null : index + 1;
 	};
 
 	const handleMergePlaylists = () => {
@@ -155,6 +166,7 @@ export default function MergePage() {
 							<PlaylistCard
 								playlist={playlist}
 								selectedPlaylists={selectedPlaylists}
+								selectionOrder={getSelectionOrder(playlist.id ?? "")}
 								onPlaylistSelection={handlePlaylistSelect}
 								key={playlist.id}
 							/>
