@@ -25,9 +25,15 @@ const selectedPlaylistsSchema = z.object({
 
 export const Route = createFileRoute("/merge")({
 	validateSearch: zodValidator(selectedPlaylistsSchema),
-	beforeLoad: async () => {
+	beforeLoad: async ({ location }) => {
 		const { data, error } = await authClient.getSession();
-		if (error || !data) throw redirect({ to: "/" });
+		if (error || !data)
+			throw redirect({
+				to: "/login",
+				search: {
+					redirect: location.pathname,
+				},
+			});
 	},
 	loader: async () => {
 		const response = await app.api.spotify.playlists.get();
