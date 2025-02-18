@@ -53,6 +53,7 @@ export default function MergePage() {
 		navigate({
 			search: (prev) => ({ ...prev, selectedPlaylists: newSelectedPlaylists }),
 			resetScroll: false,
+			replace: true,
 		});
 	};
 
@@ -60,6 +61,7 @@ export default function MergePage() {
 		navigate({
 			search: (prev) => ({ ...prev, dialogOpen: true }),
 			resetScroll: false,
+			replace: true,
 		});
 	};
 
@@ -71,6 +73,7 @@ export default function MergePage() {
 				mergedPlaylistName: undefined,
 			}),
 			resetScroll: false,
+			replace: true,
 		});
 	};
 
@@ -78,6 +81,7 @@ export default function MergePage() {
 		navigate({
 			search: (prev) => ({ ...prev, mergedPlaylistName: name }),
 			resetScroll: false,
+			replace: true,
 		});
 	};
 
