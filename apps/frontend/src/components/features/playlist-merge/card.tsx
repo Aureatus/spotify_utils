@@ -17,7 +17,7 @@ export default function PlaylistCard({
 	return (
 		<button
 			type="button"
-			className={`relative rounded-lg overflow-hidden cursor-pointer group w-full text-left
+			className={`relative rounded-lg overflow-hidden cursor-pointer group w-full text-left select-none
                 ${selectedPlaylists.includes(playlist.id ?? "") ? "ring-2 ring-primary" : ""}
             `}
 			onClick={() => onPlaylistSelection(playlist.id ?? "")}
@@ -36,6 +36,7 @@ export default function PlaylistCard({
 						src={playlist.images[0].url}
 						alt={playlist.name ?? "Playlist"}
 						className="w-full h-full object-cover"
+						draggable={false}
 					/>
 				) : (
 					<div className="w-full h-full bg-muted flex items-center justify-center">
