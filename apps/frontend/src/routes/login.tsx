@@ -2,15 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { authClient } from "@/lib/auth-client";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
 
 export const Route = createFileRoute("/login")({
-	validateSearch: zodValidator(
-		z.object({
-			redirect: z.string().optional(),
-		}),
-	),
+	validateSearch: z.object({
+		redirect: z.string().optional(),
+	}),
 	component: LoginPage,
 	beforeLoad: async ({ search }) => {
 		const { data } = await authClient.getSession();
@@ -27,9 +24,15 @@ export default function LoginPage() {
 	const { redirect: redirectPath } = Route.useSearch();
 
 	const spotifySignIn = async () => {
+		// Include the redirect in the callback URL
+		const callbackUrl = new URL("/auth/callback", window.location.origin);
+		if (redirectPath) {
+			callbackUrl.searchParams.set("redirect", redirectPath);
+		}
+
 		await authClient.signIn.social({
 			provider: "spotify",
-			callbackURL: `${window.location.origin}${redirectPath ?? ""}`,
+			callbackURL: callbackUrl.toString(),
 		});
 	};
 
