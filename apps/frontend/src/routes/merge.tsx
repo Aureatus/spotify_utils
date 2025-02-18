@@ -1,5 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	redirect,
+	useNavigate,
+	useRouter,
+} from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
 
@@ -25,25 +29,23 @@ export const Route = createFileRoute("/merge")({
 		const { data, error } = await authClient.getSession();
 		if (error || !data) throw redirect({ to: "/" });
 	},
+	loader: async () => {
+		const response = await app.api.spotify.playlists.get();
+		const { data, error } = response;
+		if (error) throw error;
+		return { playlists: data };
+	},
+	staleTime: Number.POSITIVE_INFINITY,
 	component: MergePage,
 });
 
 export default function MergePage() {
 	const { selectedPlaylists, mergedPlaylistName, dialogOpen } =
 		Route.useSearch();
+	const { playlists } = Route.useLoaderData();
 	const navigate = useNavigate({ from: Route.fullPath });
-
+	const router = useRouter();
 	const { toast } = useToast();
-
-	const { data: playlists } = useQuery({
-		queryKey: ["playlists"],
-		queryFn: async () => {
-			const response = await app.api.spotify.playlists.get();
-			const { data, error } = response;
-			if (error) throw error;
-			return data;
-		},
-	});
 
 	const handlePlaylistSelect = (playlistId: string) => {
 		const newSelectedPlaylists = selectedPlaylists.includes(playlistId)
@@ -127,6 +129,7 @@ export default function MergePage() {
 				duration: 500,
 				style: { borderRadius: 6 },
 			});
+			await router.invalidate();
 		} catch {
 			toast({
 				variant: "destructive",
