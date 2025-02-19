@@ -8,5 +8,8 @@
     "start:backend": "cd apps/backend && bun run start",
     "start:frontend": "cd apps/frontend && bun run dev"
   },
-  "packageManager": "bun@1.1.4"
+  "packageManager": "bun@1.1.4",
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4"
+  }
 }

@@ -1,49 +1,58 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Check } from "lucide-react";
-
+import { MusicIcon } from "lucide-react";
 import type { SimplifiedPlaylistObject } from "../../../../../backend/src/lib/orval/spotify-api-client";
 
 interface PlaylistCardProps {
-  playlist: SimplifiedPlaylistObject;
-  selectedPlaylists: string[];
-  onPlaylistSelection: (id: string) => void;
+	playlist: SimplifiedPlaylistObject;
+	selectedPlaylists: string[];
+	selectionOrder: number | null;
+	onPlaylistSelection: (playlistId: string) => void;
 }
 
-const PlaylistCard = ({
-  playlist,
-  selectedPlaylists,
-  onPlaylistSelection,
-}: PlaylistCardProps) => {
-  return (
-    <Card
-      key={playlist.id}
-      className="overflow-hidden cursor-pointer relative group hover:bg-muted/50 transition-colors"
-      onClick={() => playlist.id && onPlaylistSelection(playlist.id)}
-    >
-      <CardContent className="p-2">
-        <div className="aspect-square relative mb-2">
-          <img
-            src={playlist?.images?.[0]?.url || "/placeholder.svg"}
-            alt={playlist.name}
-            className="object-cover w-full h-full rounded"
-          />
-          {playlist.id && selectedPlaylists.includes(playlist.id) && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="absolute inset-0 bg-black/40" />
-              <div className="relative z-10 bg-primary rounded-full p-2">
-                <Check className="text-white w-6 h-6" />
-              </div>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-        </div>
-        <p className="text-sm font-medium truncate">{playlist.name}</p>
-        {playlist.id && selectedPlaylists.includes(playlist.id) && (
-          <div className="absolute top-0 right-0 left-0 h-1 bg-primary" />
-        )}
-      </CardContent>
-    </Card>
-  );
-};
+export default function PlaylistCard({
+	playlist,
+	selectedPlaylists,
+	selectionOrder,
+	onPlaylistSelection,
+}: PlaylistCardProps) {
+	return (
+		<button
+			type="button"
+			className={`relative rounded-lg overflow-hidden cursor-pointer group w-full text-left select-none
+                ${selectedPlaylists.includes(playlist.id ?? "") ? "ring-2 ring-primary" : ""}
+            `}
+			onClick={() => onPlaylistSelection(playlist.id ?? "")}
+			aria-pressed={selectedPlaylists.includes(playlist.id ?? "")}
+			aria-label={`Select ${playlist.name} playlist`}
+		>
+			{selectionOrder && (
+				<div className="absolute top-2 right-2 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-medium z-10">
+					{selectionOrder}
+				</div>
+			)}
 
-export default PlaylistCard;
+			<div className="aspect-square relative">
+				{playlist.images?.[0]?.url ? (
+					<img
+						src={playlist.images[0].url}
+						alt={playlist.name ?? "Playlist"}
+						className="w-full h-full object-cover"
+						draggable={false}
+					/>
+				) : (
+					<div className="w-full h-full bg-muted flex items-center justify-center">
+						<MusicIcon className="w-12 h-12 text-muted-foreground" />
+					</div>
+				)}
+			</div>
+
+			<div className="p-4 bg-black/80 backdrop-blur-sm">
+				<h3 className="font-semibold text-base text-white mb-1 truncate">
+					{playlist.name}
+				</h3>
+				<p className="text-sm font-medium text-white/70 truncate">
+					{playlist.tracks?.total ?? 0} tracks
+				</p>
+			</div>
+		</button>
+	);
+}

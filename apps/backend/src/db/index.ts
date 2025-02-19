@@ -1,10 +1,10 @@
 import "dotenv/config";
-import { drizzle } from "drizzle-orm/bun-sqlite";
 import { Database } from "bun:sqlite";
+import { drizzle } from "drizzle-orm/bun-sqlite";
+import { DB_FILE_NAME } from "../env";
 import * as schema from "./schema";
 
-console.log(process.env.DB_FILE_NAME!);
-
-const sqlite = new Database(process.env.DB_FILE_NAME!);
+const sqlite = new Database(DB_FILE_NAME);
+sqlite.exec("PRAGMA journal_mode = WAL;");
 
 export const db = drizzle(sqlite, { schema: schema });
