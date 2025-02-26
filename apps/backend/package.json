@@ -19,6 +19,7 @@
 		"drizzle-orm": "^0.39.2",
 		"drizzle-typebox": "^0.3.0",
 		"elysia": "^1.2.12",
+		"hono": "^4.7.2",
 		"pino-pretty": "^13.0.0"
 	},
 	"override": {
