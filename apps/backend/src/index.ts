@@ -2,6 +2,7 @@ import { logger } from "@bogeychan/elysia-logger";
 import cors from "@elysiajs/cors";
 import { Elysia, t } from "elysia";
 
+import { Hono } from "hono";
 import {
 	createMergedPlaylistForUser,
 	getCurrentUserPlaylists,
@@ -32,7 +33,7 @@ const SpotifyMergeSchema = {
 	}),
 };
 
-const app = new Elysia()
+const elysia = new Elysia()
 	.use(
 		logger({
 			transport: {
@@ -81,4 +82,6 @@ const app = new Elysia()
 	.get("/health", () => "OK")
 	.listen(3000);
 
-export type App = typeof app;
+new Hono().mount("/elysia", elysia.fetch);
+
+export type App = typeof elysia;
