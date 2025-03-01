@@ -10,6 +10,13 @@ if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET)
 
 export const auth = betterAuth({
 	trustedOrigins: ["https://localhost:5173", "*.spotify-utils-5h1.pages.dev"],
+	advanced: {
+		useSecureCookies: true,
+		crossSubDomainCookies: {
+			domain: ".", // Use root domain
+			enabled: true,
+		},
+	},
 	socialProviders: {
 		spotify: {
 			clientId: SPOTIFY_CLIENT_ID,
