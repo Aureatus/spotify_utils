@@ -1,15 +1,15 @@
 {
-  "name": "spotify_utils",
-  "workspaces": [
-    "apps/*"
-  ],
-  "scripts": {
-    "start": "bun run start:backend & bun run start:frontend",
-    "start:backend": "cd apps/backend && bun run start",
-    "start:frontend": "cd apps/frontend && bun run dev"
-  },
-  "packageManager": "bun@1.1.4",
-  "devDependencies": {
-    "@biomejs/biome": "1.9.4"
-  }
+	"name": "spotify_utils",
+	"workspaces": ["apps/*"],
+	"scripts": {
+		"start": "bun run start:backend & bun run start:frontend",
+		"start:backend": "cd apps/backend && bun run start",
+		"start:frontend": "cd apps/frontend && bun run dev",
+		"deploy:frontend": "cd apps/frontend && bun run build && bun wrangler pages deploy"
+	},
+	"packageManager": "bun@1.1.4",
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"wrangler": "^3.111.0"
+	}
 }
