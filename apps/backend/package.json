@@ -4,7 +4,7 @@
 	"devDependencies": {
 		"@types/bun": "^1.2.2",
 		"bun-types": "^1.2.2",
-		"drizzle-kit": "^0.30.4",
+		"drizzle-kit": "^0.30.5",
 		"orval": "^7.5.0"
 	},
 	"peerDependencies": {
@@ -27,6 +27,7 @@
 	},
 	"scripts": {
 		"start": "bun run --watch src/index.ts",
-		"generate-spotify-client": "orval --config ./src/lib/orval/orval.config.js"
+		"generate-spotify-client": "orval --config ./src/lib/orval/orval.config.js",
+		"migrate": "bun drizzle-kit migrate"
 	}
 }

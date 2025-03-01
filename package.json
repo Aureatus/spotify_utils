@@ -6,7 +6,8 @@
   "scripts": {
     "start": "bun run start:backend & bun run start:frontend",
     "start:backend": "cd apps/backend && bun run start",
-    "start:frontend": "cd apps/frontend && bun run dev"
+    "start:frontend": "cd apps/frontend && bun run dev",
+    "deploy:backend:production": "flyctl deploy --config apps/backend/fly.toml --dockerfile apps/backend/Dockerfile"
   },
   "packageManager": "bun@1.1.4",
   "devDependencies": {
