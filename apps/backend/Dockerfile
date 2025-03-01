@@ -11,5 +11,7 @@ RUN bun install
 # Copy only the backend code
 COPY apps/backend .
 
+ENV NODE_ENV=production
+
 EXPOSE 3000
 CMD ["sh", "-c", "bun drizzle-kit migrate && bun run start"]
