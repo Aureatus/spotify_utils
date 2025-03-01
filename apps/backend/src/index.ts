@@ -1,5 +1,6 @@
 import { logger } from "@bogeychan/elysia-logger";
 import cors from "@elysiajs/cors";
+import { file } from "bun";
 import { Elysia, t } from "elysia";
 
 import {
@@ -32,7 +33,23 @@ const SpotifyMergeSchema = {
 	}),
 };
 
-const app = new Elysia()
+const serveSettings =
+	process.env.NODE_ENV !== "production"
+		? {
+				tls: {
+					cert: file(
+						"/home/aureatus/dev/projects/spotify_utils/cert/localhost.pem",
+					),
+					key: file(
+						"/home/aureatus/dev/projects/spotify_utils/cert/localhost-key.pem",
+					),
+				},
+			}
+		: undefined;
+
+const app = new Elysia({
+	serve: serveSettings,
+})
 	.use(
 		logger({
 			transport: {
