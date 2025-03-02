@@ -17,7 +17,7 @@ export const auth = betterAuth({
 	advanced: {
 		useSecureCookies: true,
 		crossSubDomainCookies: {
-			domain: ".", // Use root domain
+			domain: ".spotifyutils.app", // Use root domain
 			enabled: true,
 		},
 	},
