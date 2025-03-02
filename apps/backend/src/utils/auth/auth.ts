@@ -9,7 +9,11 @@ if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET)
 	throw new Error("Spotify credentials missing");
 
 export const auth = betterAuth({
-	trustedOrigins: ["https://localhost:5173", "*.spotify-utils-5h1.pages.dev"],
+	trustedOrigins: [
+		"https://localhost:5173",
+		"*.spotify-utils-5h1.pages.dev",
+		"https://spotifyutils.app",
+	],
 	advanced: {
 		useSecureCookies: true,
 		crossSubDomainCookies: {
